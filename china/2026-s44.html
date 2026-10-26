@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GIS Risk Forecaster — Riesgo Compuesto: China · Semana 43</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap');
+
+  :root{
+    --ink:#0E1A2B;
+    --ink-2:#152A44;
+    --ink-3:#1D3654;
+    --paper:#F4F6F3;
+    --paper-2:#FFFFFF;
+    --line:#DDE3DC;
+    --line-dark:#2A4160;
+    --muted:#5B6B72;
+    --muted-light:#93A6B4;
+    --teal:#12817B;
+    --teal-light:#B7E0DC;
+    --bajo:#2E8B57;
+    --medio:#C08A22;
+    --alto:#D96B1F;
+    --critico:#BE3A2B;
+    --radius:14px;
+    --maxw:1080px;
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',system-ui,-apple-system,Segoe UI,sans-serif;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3{
+    font-family:'Space Grotesk',system-ui,sans-serif;
+    letter-spacing:-0.01em;
+    margin:0;
+  }
+  .mono{font-family:'IBM Plex Mono',ui-monospace,monospace;}
+  a{color:inherit;}
+  img,svg{display:block;max-width:100%;}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 28px;}
+  section{padding:88px 0;}
+  @media (max-width:640px){ section{padding:56px 0;} .wrap{padding:0 20px;} }
+
+  /* ---------- eyebrow / chips ---------- */
+  .eyebrow{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12.5px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--teal-light);
+    display:flex;align-items:center;gap:10px;
+    margin-bottom:22px;
+  }
+  .eyebrow .dot{width:7px;height:7px;border-radius:50%;background:var(--teal-light);
+    box-shadow:0 0 0 4px rgba(183,224,220,0.18);}
+  .eyebrow.dark{color:var(--teal);}
+  .eyebrow.dark .dot{background:var(--teal);box-shadow:0 0 0 4px rgba(18,129,123,0.14);}
+
+  .chip{
+    display:inline-flex;align-items:center;gap:7px;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;font-weight:600;letter-spacing:0.05em;
+    padding:5px 11px 5px 9px;border-radius:100px;
+    text-transform:uppercase;
+  }
+  .chip::before{content:'';width:7px;height:7px;border-radius:50%;background:currentColor;}
+  .chip.bajo{color:var(--bajo);background:rgba(46,139,87,0.1);}
+  .chip.medio{color:var(--medio);background:rgba(192,138,34,0.12);}
+  .chip.alto{color:var(--alto);background:rgba(217,107,31,0.12);}
+  .chip.critico{color:var(--critico);background:rgba(190,58,43,0.12);}
+
+  /* ================= HERO ================= */
+  .hero{
+    background:radial-gradient(ellipse 900px 500px at 78% -10%, #1B3554 0%, var(--ink) 55%), var(--ink);
+    color:#EAF0F2;
+    padding:72px 0 0;
+    overflow:hidden;
+  }
+  .hero .wrap{display:grid;grid-template-columns:1.05fr 0.95fr;gap:40px;align-items:center;}
+  @media (max-width:880px){ .hero .wrap{grid-template-columns:1fr;} }
+
+  .hero h1{
+    font-size:clamp(30px,4vw,44px);
+    line-height:1.12;
+    font-weight:700;
+    color:#fff;
+    margin-bottom:22px;
+  }
+  .hero h1 em{font-style:normal;color:var(--teal-light);}
+  .hero p.lead{
+    font-size:16.5px;
+    color:#B9C6D0;
+    max-width:52ch;
+    margin-bottom:30px;
+  }
+  .hero .meta-row{
+    display:flex;gap:22px;flex-wrap:wrap;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12.5px;color:var(--muted-light);
+    border-top:1px solid rgba(255,255,255,0.12);
+    padding-top:18px;
+    margin-bottom:0;
+  }
+  .hero .meta-row b{color:#DCE6EA;font-weight:600;}
+
+  /* risk score badge */
+  .score-card{
+    background:linear-gradient(180deg,rgba(255,255,255,0.05),rgba(255,255,255,0.02));
+    border:1px solid rgba(255,255,255,0.12);
+    border-radius:var(--radius);
+    padding:26px 26px 22px;
+  }
+  .score-card .label{
+    font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:0.12em;
+    text-transform:uppercase;color:var(--muted-light);margin-bottom:14px;
+  }
+  .score-big{
+    font-family:'Space Grotesk',sans-serif;font-weight:700;
+    font-size:52px;color:var(--alto);line-height:1;margin-bottom:16px;
+    display:flex;align-items:baseline;gap:12px;
+  }
+  .score-big span.suffix{font-size:14px;font-family:'IBM Plex Mono',monospace;font-weight:500;color:var(--muted-light);}
+  .gauge{display:flex;gap:4px;margin-bottom:10px;}
+  .gauge i{flex:1;height:8px;border-radius:3px;background:rgba(255,255,255,0.1);position:relative;}
+  .gauge i.on-bajo{background:var(--bajo);}
+  .gauge i.on-medio{background:var(--medio);}
+  .gauge i.on-alto{background:var(--alto);}
+  .gauge-labels{display:flex;justify-content:space-between;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--muted-light);text-transform:uppercase;letter-spacing:0.04em;}
+  .gauge-labels .active{color:#fff;font-weight:600;}
+
+  /* signature radar svg */
+  .radar-wrap{position:relative;margin-top:26px;}
+  .pulse{transform-origin:center;animation:pulse 2.6s ease-out infinite;}
+  .pulse.d2{animation-delay:0.6s;}
+  .pulse.d3{animation-delay:1.3s;}
+  @keyframes pulse{
+    0%{r:4;opacity:0.9;}
+    100%{r:22;opacity:0;}
+  }
+  @media (prefers-reduced-motion:reduce){ .pulse{animation:none;opacity:0.35;} }
+
+  /* ================= HOW IT WORKS ================= */
+  .how{background:var(--paper-2);border-bottom:1px solid var(--line);}
+  .how h2{font-size:clamp(24px,3vw,32px);margin-bottom:14px;color:var(--ink);}
+  .how > .wrap > p{color:var(--muted);max-width:64ch;margin-bottom:48px;font-size:15.5px;}
+
+  .engine{display:flex;gap:24px;align-items:stretch;}
+  @media (max-width:800px){ .engine{flex-direction:column;} .engine .arrow{display:none;} }
+  .engine .arrow{flex:0 0 auto;align-self:center;color:var(--muted-light);font-size:22px;}
+  .engine-col{
+    flex:1 1 0;min-width:0;
+    background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);
+    padding:26px;
+  }
+  .engine-col h3{font-size:16.5px;margin-bottom:6px;}
+  .engine-col .tag{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--teal);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:12px;display:block;}
+  .engine-col ul{margin:0;padding-left:18px;color:var(--muted);font-size:14.5px;}
+  .engine-col li{margin-bottom:8px;}
+  .engine-col li b{color:var(--ink);font-weight:600;}
+  .engine-col.result{background:var(--ink);color:#EAF0F2;border-color:var(--ink);}
+  .engine-col.result .tag{color:var(--teal-light);}
+  .engine-col.result ul{color:#B9C6D0;}
+  .engine-col.result li b{color:#fff;}
+
+  /* ================= EXPOSURE STATS ================= */
+  .exposure{background:var(--ink);color:#EAF0F2;}
+  .exposure .eyebrow{color:var(--teal-light);}
+  .exposure h2{color:#fff;font-size:clamp(22px,3vw,30px);max-width:38ch;margin-bottom:44px;}
+  .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(255,255,255,0.1);border-radius:var(--radius);overflow:hidden;}
+  @media (max-width:760px){ .stat-grid{grid-template-columns:repeat(2,1fr);} }
+  .stat{background:var(--ink-2);padding:26px 22px;}
+  .stat .num{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:34px;color:#fff;margin-bottom:6px;}
+  .stat .num small{font-size:15px;font-weight:600;color:var(--teal-light);}
+  .stat .desc{font-size:13px;color:var(--muted-light);line-height:1.4;}
+
+  .province-strip{margin-top:34px;display:flex;flex-wrap:wrap;gap:10px;}
+  .prov-pill{
+    font-family:'IBM Plex Mono',monospace;font-size:12.5px;
+    border:1px solid rgba(255,255,255,0.16);border-radius:100px;
+    padding:7px 14px;color:#DCE6EA;display:flex;gap:8px;align-items:center;
+  }
+  .prov-pill b{color:#fff;}
+  .prov-pill.hit{border-color:rgba(217,107,31,0.55);color:#F3D9C4;}
+  .prov-pill.hit b{color:var(--alto);}
+
+  /* ================= SIGNAL CARDS ================= */
+  .signals{background:var(--paper);}
+  .signals h2{font-size:clamp(24px,3vw,32px);margin-bottom:10px;}
+  .signals > .wrap > p.sub{color:var(--muted);max-width:60ch;margin-bottom:44px;font-size:15.5px;}
+  .signal-list{display:flex;flex-direction:column;gap:16px;}
+  .signal{
+    background:var(--paper-2);border:1px solid var(--line);border-radius:var(--radius);
+    padding:26px 28px;display:grid;grid-template-columns:210px 1fr;gap:26px;
+  }
+  @media (max-width:760px){ .signal{grid-template-columns:1fr;gap:14px;} }
+  .signal .side{display:flex;flex-direction:column;gap:10px;}
+  .signal .side .kicker{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;}
+  .signal .headline{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:19px;margin-bottom:8px;line-height:1.25;}
+  .signal p{margin:0 0 10px;color:var(--muted);font-size:14.8px;}
+  .signal .src{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--muted-light);}
+
+  /* ================= MATRIX ================= */
+  .matrix{background:var(--paper-2);border-top:1px solid var(--line);border-bottom:1px solid var(--line);}
+  .matrix h2{font-size:clamp(24px,3vw,30px);margin-bottom:36px;}
+  .table-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:0 -4px;}
+  table{width:100%;min-width:560px;border-collapse:collapse;}
+  thead th{
+    text-align:left;font-family:'IBM Plex Mono',monospace;font-size:11.5px;text-transform:uppercase;
+    letter-spacing:0.06em;color:var(--muted);padding:0 14px 12px;border-bottom:2px solid var(--ink);
+  }
+  tbody td{padding:16px 14px;border-bottom:1px solid var(--line);font-size:14.8px;vertical-align:top;}
+  tbody tr:last-child td{border-bottom:2px solid var(--ink);font-weight:600;}
+  tbody td:first-child{font-weight:600;white-space:nowrap;}
+  tbody td.driver{color:var(--muted);font-weight:400;max-width:420px;}
+
+  /* ================= COST / VALUE ================= */
+  .value{background:var(--paper);}
+  .value-grid{display:grid;grid-template-columns:1fr 1fr;gap:44px;}
+  @media (max-width:820px){ .value-grid{grid-template-columns:1fr;} }
+  .value h2{font-size:clamp(22px,3vw,28px);margin-bottom:16px;}
+  .value .cost p{color:var(--muted);font-size:15px;margin-bottom:14px;}
+  .value .cost .flag{
+    display:inline-block;font-family:'IBM Plex Mono',monospace;font-size:11.5px;
+    color:var(--critico);background:rgba(190,58,43,0.09);border-radius:100px;padding:5px 12px;margin-bottom:16px;
+  }
+  .value ul.props{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:16px;}
+  .value ul.props li{
+    display:flex;gap:14px;background:var(--paper-2);border:1px solid var(--line);border-radius:12px;padding:16px 18px;
+  }
+  .value ul.props .ic{color:var(--teal);flex-shrink:0;margin-top:2px;}
+  .value ul.props b{display:block;font-size:14.5px;margin-bottom:3px;}
+  .value ul.props span{font-size:13.6px;color:var(--muted);}
+
+  /* ================= CTA ================= */
+  .cta{
+    background:linear-gradient(160deg,var(--ink) 0%,#0A1420 100%);
+    color:#fff;text-align:center;
+  }
+  .cta h2{font-size:clamp(26px,4vw,38px);max-width:22ch;margin:0 auto 16px;}
+  .cta p{color:#B9C6D0;max-width:52ch;margin:0 auto 32px;font-size:15.5px;}
+  .btn{
+    display:inline-block;background:var(--teal);color:#fff;font-weight:600;font-size:15px;
+    padding:15px 30px;border-radius:100px;text-decoration:none;
+    box-shadow:0 8px 24px rgba(18,129,123,0.35);
+    transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .btn:hover{transform:translateY(-1px);box-shadow:0 10px 28px rgba(18,129,123,0.45);}
+  .btn:focus-visible{outline:2px solid #fff;outline-offset:3px;}
+  .cta .note{margin-top:18px;font-size:12.5px;color:var(--muted-light);}
+
+  /* ================= FOOTER ================= */
+  footer{background:var(--ink);color:var(--muted-light);padding:44px 0 34px;font-size:12.5px;}
+  footer .cols{display:grid;grid-template-columns:1.2fr 1fr;gap:40px;}
+  @media (max-width:760px){ footer .cols{grid-template-columns:1fr;} }
+  footer h4{font-family:'IBM Plex Mono',monospace;color:#DCE6EA;font-size:11px;text-transform:uppercase;letter-spacing:0.08em;margin:0 0 12px;}
+  footer ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px;}
+  footer .disclaimer{margin-top:28px;border-top:1px solid rgba(255,255,255,0.1);padding-top:18px;line-height:1.6;}
+  footer .brand{color:#EAF0F2;font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:14px;margin-bottom:8px;}
+
+  /* ---- niveles dinamicos (plantilla semanal) ---- */
+  .score-big.bajo{color:var(--bajo);} .score-big.medio{color:var(--medio);}
+  .score-big.alto{color:var(--alto);} .score-big.critico{color:var(--critico);}
+  .gauge i.on-critico{background:var(--critico);}
+</style>
+</head>
+<body>
+
+<!-- ============ HERO ============ -->
+<header class="hero">
+  <div class="wrap">
+    <div>
+      <div class="eyebrow"><span class="dot"></span> GIS RISK FORECASTER · LECTURA DE RIESGO COMPUESTO · SEMANA 44</div>
+      <h1>China en riesgo <em>Medio</em>: la logística portuaria sigue como foco y no hay alertas nuevas verificadas en inocuidad</h1>
+      <p class="lead">El modelo cruzó tu historial de inspecciones con el monitoreo de fuentes regulatorias, portuarias y de prensa de los últimos 7 días. Esto es lo que encontró para tus proveedores chinos al corte de este informe.</p>
+      <div class="meta-row">
+        <div>CORTE DE DATOS <b>26-oct-2026</b></div>
+        <div>PROVEEDORES ANALIZADOS <b>47</b></div>
+        <div>INSPECCIONES EN CARTERA <b>413</b></div>
+        <div>DATOS INTERNOS HASTA <b>26-jul-2026 (92 días de antigüedad)</b></div>
+        <div>VARIACIÓN <b>Sin cambio vs. semana 43 (46)</b></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="score-card">
+        <div class="label">Índice de Riesgo Compuesto</div>
+        <div class="score-big medio">Medio <span class="suffix">46 / 100</span></div>
+        <div class="gauge">
+          <i class="on-bajo"></i><i class="on-medio"></i><i class=""></i><i class=""></i>
+        </div>
+        <div class="gauge-labels">
+          <span class="">Bajo</span><span class="active">Medio</span><span class="">Alto</span><span class="">Crítico</span>
+        </div>
+
+        <div class="radar-wrap">
+          <svg viewBox="0 0 320 190" width="100%" height="auto" role="img" aria-label="Mapa de señales activas en la ruta China-Chile">
+            <path d="M 40 8 C 55 30, 35 55, 50 78 C 62 98, 45 118, 58 142 C 68 160, 55 175, 62 186"
+                  fill="none" stroke="#33526f" stroke-width="2"/>
+            <path d="M 62 100 C 140 130, 220 150, 288 168" fill="none" stroke="#3A5A78" stroke-width="1.4" stroke-dasharray="3 5"/>
+            <circle cx="288" cy="168" r="4" fill="#93A6B4"/>
+            <text x="266" y="184" fill="#93A6B4" font-family="IBM Plex Mono, monospace" font-size="9">CHILE</text>
+            <g>
+              <circle class="pulse" cx="50" cy="30" r="4" fill="none" stroke="#D96B1F" stroke-width="1.6"/>
+              <circle cx="50" cy="30" r="4" fill="#D96B1F"/>
+              <text x="60" y="26" fill="#DCE6EA" font-family="IBM Plex Mono, monospace" font-size="9">Shanghai</text>
+              <text x="60" y="37" fill="#93A6B4" font-family="IBM Plex Mono, monospace" font-size="8">previsión espera &gt;5 d (Dimerco)</text>
+            </g>
+            <g>
+              <circle class="pulse d2" cx="47" cy="63" r="4" fill="none" stroke="#D96B1F" stroke-width="1.6"/>
+              <circle cx="47" cy="63" r="4" fill="#D96B1F"/>
+              <text x="60" y="60" fill="#DCE6EA" font-family="IBM Plex Mono, monospace" font-size="9">Ningbo</text>
+              <text x="60" y="71" fill="#93A6B4" font-family="IBM Plex Mono, monospace" font-size="8">sin dato semanal</text>
+            </g>
+            <g>
+              <circle class="pulse d3" cx="60" cy="98" r="4" fill="none" stroke="#C08A22" stroke-width="1.6"/>
+              <circle cx="60" cy="98" r="4" fill="#C08A22"/>
+              <text x="70" y="95" fill="#DCE6EA" font-family="IBM Plex Mono, monospace" font-size="9">Qingdao</text>
+              <text x="70" y="106" fill="#93A6B4" font-family="IBM Plex Mono, monospace" font-size="8">sin novedad verificada</text>
+            </g>
+            <g>
+              <circle cx="55" cy="135" r="4" fill="#C08A22"/>
+              <text x="65" y="132" fill="#DCE6EA" font-family="IBM Plex Mono, monospace" font-size="9">Shenzhen/Yantian</text>
+              <text x="65" y="143" fill="#93A6B4" font-family="IBM Plex Mono, monospace" font-size="8">sin novedad verificada</text>
+            </g>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ============ HOW IT WORKS ============ -->
+<section class="how">
+  <div class="wrap">
+    <div class="eyebrow dark"><span class="dot"></span> METODOLOGÍA</div>
+    <h2>No es una alerta genérica. Es tu cartera, cruzada con el mundo real.</h2>
+    <p>El GIS Risk Forecaster combina el historial operativo de inspecciones de GIS con el monitoreo de fuentes regulatorias y de prensa internacional, para producir un Índice de Riesgo compuesto por país y categoría de producto.</p>
+
+    <div class="engine">
+      <div class="engine-col">
+        <span class="tag">Datos internos · Historial GIS</span>
+        <h3>Lo que ya sabemos de ti</h3>
+        <ul>
+          <li><b>413</b> inspecciones desde China (11-ene-2025 a 26-jul-2026)</li>
+          <li><b>27,8 %</b> de esos casos cerraron "aprobado con observaciones"</li>
+          <li><b>3,6 %</b> de tasa de rechazo, frente a 2,5 % del resto de la cartera</li>
+          <li><b>47</b> proveedores; los 3 mayores concentran <b>31,7 %</b> de las inspecciones</li>
+        </ul>
+      </div>
+      <div class="arrow">→</div>
+      <div class="engine-col">
+        <span class="tag">Datos externos · Monitoreo</span>
+        <h3>Lo que vigilamos por ti</h3>
+        <ul>
+          <li>Alertas sanitarias y de inocuidad (FDA, RASFF, ACHIPIA)</li>
+          <li>Eventos climáticos y cierres portuarios</li>
+          <li>Cambios arancelarios y de política comercial</li>
+          <li>Congestión logística y variación de tiempos de tránsito</li>
+        </ul>
+      </div>
+      <div class="arrow">→</div>
+      <div class="engine-col result">
+        <span class="tag">Índice compuesto</span>
+        <h3>Tu Índice de Riesgo hoy</h3>
+        <ul>
+          <li>Clasificación en <b>4 niveles</b>: Bajo, Medio, Alto, Crítico</li>
+          <li>Cinco dimensiones: historial GIS, logística, clima, inocuidad y regulatorio</li>
+          <li>Comparación semana a semana</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ EXPOSURE ============ -->
+<section class="exposure">
+  <div class="wrap">
+    <div class="eyebrow"><span class="dot"></span> TU EXPOSICIÓN, NO LA DE CUALQUIERA</div>
+    <h2>Casi un tercio de tus inspecciones en China se concentra en tres proveedores</h2>
+
+    <div class="stat-grid">
+      <div class="stat">
+        <div class="num">413</div>
+        <div class="desc">Inspecciones de origen China con GIS (11-ene-2025 a 26-jul-2026)</div>
+      </div>
+      <div class="stat">
+        <div class="num">31,7 %</div>
+        <div class="desc">De las inspecciones corresponde a los 3 proveedores con más casos (131 de 413 casos)</div>
+      </div>
+      <div class="stat">
+        <div class="num">72</div>
+        <div class="desc">Inspecciones de papel higiénico, la categoría con más casos en China (72 de 413, 11-ene-2025 a 26-jul-2026)</div>
+      </div>
+      <div class="stat">
+        <div class="num">3,6 %</div>
+        <div class="desc">Tasa de rechazo en China (15 de 413 inspecciones) frente a 2,5 % en el resto de la cartera (22 de 893)</div>
+      </div>
+    </div>
+
+    <div class="province-strip">
+      <div class="prov-pill"><b>72</b> Papel higiénico</div>
+      <div class="prov-pill"><b>34</b> Detergente</div>
+      <div class="prov-pill"><b>26</b> Verduras congeladas</div>
+      <div class="prov-pill"><b>23</b> Duraznos</div>
+      <div class="prov-pill"><b>17</b> Salsa de tomate</div>
+      <div class="prov-pill"><b>16</b> Jurel</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SIGNALS ============ -->
+<section class="signals">
+  <div class="wrap">
+    <div class="eyebrow dark"><span class="dot"></span> SEÑALES ACTIVAS</div>
+    <h2>Cuatro señales que el modelo detectó esta semana</h2>
+    <p class="sub">Extraídas de cobertura de prensa internacional, agencias regulatorias y datos de la industria naviera de los últimos 7 días, con impacto sobre tus categorías y proveedores.</p>
+
+    <div class="signal-list">
+      <div class="signal">
+        <div class="side">
+          <span class="kicker">Clima &amp; Puertos</span>
+          <span class="chip medio">Medio</span>
+        </div>
+        <div>
+          <div class="headline">Sin tifón con cierre portuario verificado en los últimos 7 días</div>
+          <p>La búsqueda de los últimos 7 días no arrojó cierres de puertos chinos por tifón; la temporada sigue activa y el último cierre verificado fue el del tifón Dolphin en agosto de 2026. Sin novedad verificada esta semana; se mantiene el puntaje de clima.</p>
+          <div class="src">Fuente: Maritime Executive (ago 2026); sin novedad verificada esta semana</div>
+        </div>
+      </div>
+
+      <div class="signal">
+        <div class="side">
+          <span class="kicker">Logística &amp; Fletes</span>
+          <span class="chip alto">Alto</span>
+        </div>
+        <div>
+          <div class="headline">Shanghai mantiene espera de buques por sobre lo normal</div>
+          <p>Dimerco, en su reporte de octubre de 2026, anticipa que Shanghai seguirá muy congestionado hasta mediados o fines de octubre, con esperas de atraque superiores a 5 días. Es una previsión, no una medición semanal; para Ningbo no hay dato semanal verificado.</p>
+          <div class="src">Fuente: Dimerco, reporte de fletes de octubre 2026</div>
+        </div>
+      </div>
+
+      <div class="signal">
+        <div class="side">
+          <span class="kicker">Arancelario &amp; Comercial</span>
+          <span class="chip medio">Medio</span>
+        </div>
+        <div>
+          <div class="headline">Tregua EE.UU.–China vigente hasta el 10 de enero de 2027</div>
+          <p>Los negociadores acordaron extender el acuerdo de Kuala Lumpur, que suspende ciertos aranceles y medidas no arancelarias, desde el 10 de noviembre de 2026 hasta el 10 de enero de 2027. Sin cambios adicionales verificados en los últimos 7 días.</p>
+          <div class="src">Fuente: Caixin Global (1-oct-2026); sin cambios verificados en los últimos 7 días</div>
+        </div>
+      </div>
+
+      <div class="signal">
+        <div class="side">
+          <span class="kicker">Inocuidad Alimentaria</span>
+          <span class="chip medio">Medio</span>
+        </div>
+        <div>
+          <div class="headline">Sin alertas nuevas verificadas en mariscos y conservas</div>
+          <p>No se verificaron alertas FDA, RASFF ni ACHIPIA nuevas en los últimos 7 días para mariscos, conservas o productos no alimenticios desde China. Sigue vigente la Import Alert 16-131 de camarón de acuicultura chino; sin novedad verificada esta semana.</p>
+          <div class="src">Fuente: FDA, Import Alert 16-131 (vigente)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ MATRIX ============ -->
+<section class="matrix">
+  <div class="wrap">
+    <div class="eyebrow dark"><span class="dot"></span> RESULTADO DEL MODELO</div>
+    <h2>Matriz de Riesgo Compuesto — China, 26-oct-2026</h2>
+    <div class="table-scroll">
+    <table>
+      <thead>
+        <tr><th>Dimensión</th><th>Nivel</th><th>Driver principal</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Logística / tiempos de embarque</td><td><span class="chip alto">Alto</span></td><td class="driver">Previsión de espera &gt;5 días en Shanghai hasta fines de oct 2026 (Dimerco); sin dato semanal para Ningbo. Puntaje 60.</td></tr>
+        <tr><td>Climático / operación portuaria</td><td><span class="chip medio">Medio</span></td><td class="driver">Sin cierre por tifón verificado en 7 días; temporada activa. Puntaje 30.</td></tr>
+        <tr><td>Inocuidad alimentaria</td><td><span class="chip medio">Medio</span></td><td class="driver">Sin alerta nueva verificada en 7 días; Import Alert 16-131 vigente. Puntaje 50.</td></tr>
+        <tr><td>Regulatorio / arancelario</td><td><span class="chip medio">Medio</span></td><td class="driver">Tregua vigente al 10-ene-2027, sin cambios verificados en 7 días. Puntaje 40.</td></tr>
+        <tr><td>Histórico interno GIS</td><td><span class="chip medio">Medio</span></td><td class="driver">413 casos China (11-ene-2025 a 26-jul-2026): 27,8 % con observaciones y 3,6 % de rechazo. Puntaje 45.</td></tr>
+        <tr><td>Índice compuesto final</td><td><span class="chip medio">Medio</span></td><td class="driver">Ponderación GIS 25 %, logística 20 %, clima 15 %, inocuidad 20 %, regulatorio 20 %: 0,25×45 + 0,20×60 + 0,15×30 + 0,20×50 + 0,20×40 = 45,75 → 46/100 (sin variación vs. 46 de la semana 43).</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+</section>
+
+<!-- ============ VALUE ============ -->
+<section class="value">
+  <div class="wrap value-grid">
+    <div class="cost">
+      <div class="flag">Sin inspección pre-embarque</div>
+      <h2>Un contenedor retenido no avisa antes de llegar</h2>
+      <p>Un embarque que sale de un puerto con cola, de un proveedor con historial de observaciones, en una categoría bajo mayor fiscalización sanitaria, no es un riesgo aislado: son varios riesgos que se cruzan al mismo tiempo.</p>
+      <p>El costo real no es la inspección: es la sobrestadía del contenedor, la certificación rechazada en destino, o la negociación de urgencia con tu cliente final cuando el problema ya zarpó.</p>
+    </div>
+    <div class="props-col">
+      <h2 style="margin-bottom:18px;">Cómo te ayuda GIS</h2>
+      <ul class="props">
+        <li>
+          <span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 2 L21 6 V12 C21 17 17 21 12 22 C7 21 3 17 3 12 V6 Z" stroke="currentColor" stroke-width="1.6"/><path d="M8.5 12 L11 14.5 L15.5 9.5" stroke="currentColor" stroke-width="1.6" fill="none"/></svg></span>
+          <div><b>Inspección pre-embarque dirigida</b><span>Priorizamos los puntos de control según las señales de la semana y la categoría de producto, antes de que el embarque zarpe.</span></div>
+        </li>
+        <li>
+          <span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/><path d="M12 7 V12 L15.5 14" stroke="currentColor" stroke-width="1.6"/></svg></span>
+          <div><b>Atención a tiempo</b><span>Conversemos tu próximo embarque desde China para definir qué revisar según el nivel de riesgo de esta semana.</span></div>
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CTA ============ -->
+<section class="cta">
+  <div class="wrap">
+    <h2>Blinda tu próxima carga antes de que zarpe</h2>
+    <p>Conversemos sobre cómo el GIS Risk Forecaster puede orientar la inspección de tus proveedores en China dentro de tu próximo ciclo de embarques.</p>
+    <a class="btn" href="https://globalinspectionservice.com/">Hablar con mi Ejecutivo GIS</a>
+    <div class="note">Análisis generado por GIS Risk Forecaster · semana 44 · corte de datos 26 de octubre de 2026</div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="wrap">
+    <div class="cols">
+      <div>
+        <div class="brand">GLOBAL INSPECTION SERVICE (GIS)</div>
+        <div>Innovación y Transformación Digital · Proyecto GIS 4.0 — Risk Forecaster</div>
+      </div>
+      <div>
+        <h4>Fuentes de esta lectura</h4>
+        <ul>
+          <li>Dimerco, Medio — reporte de fletes (oct 2026)</li>
+          <li>Caixin Global, Medio — extensión de tregua EE.UU.–China (oct 2026)</li>
+          <li>Maritime Executive, Medio — cierres portuarios por tifón Dolphin (ago 2026, contexto)</li>
+          <li>FDA, Organismo — Import Alert 16-131 camarón de acuicultura desde China (vigente)</li>
+          <li>Base interna GIS, Interno — Listado de Inspecciones Total v2 (corte 26-jul-2026)</li>
+        </ul>
+      </div>
+    </div>
+    <div class="disclaimer">
+      Este informe cruza datos internos de inspección de GIS con fuentes públicas de prensa y organismos regulatorios. Los niveles de riesgo son referenciales, se recalculan cada semana y este corte corresponde al 26 de octubre de 2026. Documento de uso comercial — Global Inspection Service (GIS).
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
