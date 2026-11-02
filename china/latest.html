@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GIS Risk Forecaster — Riesgo Compuesto: China · Semana 43</title>
+<title>GIS Risk Forecaster — Riesgo Compuesto: China · Semana 45</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap');
 
@@ -272,20 +272,49 @@
 </style>
 </head>
 <body>
+<!--
+PLANTILLA SEMANAL · GIS Risk Forecaster · China
+La rutina reemplaza TODOS los campos entre llaves dobles y deja el resto del texto fijo. Salida: un solo .html autocontenido.
+Niveles permitidos (solo 4): Bajo, Medio, Alto, Critico. Clase CSS = minuscula sin tilde: bajo | medio | alto | critico.
+Chip de nivel: <span class="chip CLASE">Texto</span>.
+Gauge del hero: marca las primeras N barras (N = 1 Bajo, 2 Medio, 3 Alto, 4 Critico) con on-bajo, on-medio, on-alto, on-critico
+  (barra 1 = on-bajo, 2 = on-medio, 3 = on-alto, 4 = on-critico); las demas barras quedan con clase vacia.
+Etiqueta activa del gauge: .. = "active" solo en el nivel actual; vacio en los demas.
+Pastillas de producto (<div class="prov-pill"><b>72</b> Papel higiénico</div>
+      <div class="prov-pill"><b>34</b> Detergente</div>
+      <div class="prov-pill"><b>26</b> Verduras congeladas</div>
+      <div class="prov-pill"><b>23</b> Duraznos</div>
+      <div class="prov-pill"><b>17</b> Salsa de tomate</div>
+      <div class="prov-pill"><b>16</b> Jurel</div>): las 6 categorias de producto con mas inspecciones de China, columna Productos del Excel: <div class="prov-pill hit"><b>N</b> Producto</div> (hit = categoria directamente afectada por una senal de esta semana; sin hit = no afectada).
+REGLAS DE CALCULO (obligatorias):
+  - Todas las cifras internas salen de la hoja Base del Excel filtrando Pais de facturacion = China. NO hay columna de provincia: no deducir ni mostrar provincias.
+  - Inspecciones = filas; proveedores = Nombre de Cuenta distintos; % con observaciones = Estado "Aprobada con observaciones" / total China; % rechazo = Estado que empiece con "Rechaz" o "Informe rechazado" / total China; % rechazo resto = mismo calculo sobre los demas paises.
+  - Periodo de datos = menor y mayor Fecha Final de China. Si el dato mas reciente tiene mas de 30 dias, decirlo en la nota de la portada.
+  - Nivel de cada dimension y del indice: 0-25 Bajo, 26-50 Medio, 51-75 Alto, 76-100 Critico.
+  - Indice = 0,25 x Historial GIS + 0,20 x Logistica + 0,15 x Clima + 0,20 x Inocuidad + 0,20 x Regulatorio, redondeado al entero. Escribir ese calculo en el historial. Ponderación GIS 25 %, logística 20 %, clima 15 %, inocuidad 20 %, regulatorio 20 %: 0,25×45 + 0,20×60 + 0,15×30 + 0,20×50 + 0,20×40 = 45,75 → 46/100 (sin variación vs. 46 de la semana 44). debe decir: Ponderacion GIS 25 %, logistica 20 %, clima 15 %, inocuidad 20 %, regulatorio 20 % (y el calculo con los 5 puntajes).
+  - Toda cifra del texto debe incluir su denominador o periodo y una sola fuente; no mezclar dos medidas distintas en una frase.
+Fuentes del pie (<li>Dimerco, Medio — reporte de fletes (oct 2026)</li>
+          <li>Caixin Global, Medio — extensión de tregua EE.UU.–China (oct 2026)</li>
+          <li>Business Today, Medio — cierres portuarios por tifón en Zhejiang y Fujian (ago 2026, contexto)</li>
+          <li>FDA, Organismo — Import Alert 16-131 camarón de acuicultura desde China (vigente)</li>
+          <li>Base interna GIS, Interno — Listado de Inspecciones Total v2 (corte 26-jul-2026)</li>): <li>Medio, Medio — tema (mes aaaa)</li> solo fuentes verificadas de esta semana.
+Colores de puertos (#D96B1F..#C08A22): bajo #2E8B57, medio #C08A22, alto #D96B1F, critico #BE3A2B.
+Prohibido inventar cifras: si un dato no se pudo verificar, dilo en el texto ("sin novedad verificada").
+-->
 
 <!-- ============ HERO ============ -->
 <header class="hero">
   <div class="wrap">
     <div>
-      <div class="eyebrow"><span class="dot"></span> GIS RISK FORECASTER · LECTURA DE RIESGO COMPUESTO · SEMANA 44</div>
-      <h1>China en riesgo <em>Medio</em>: la logística portuaria sigue como foco y no hay alertas nuevas verificadas en inocuidad</h1>
+      <div class="eyebrow"><span class="dot"></span> GIS RISK FORECASTER · LECTURA DE RIESGO COMPUESTO · SEMANA 45</div>
+      <h1>China en riesgo <em>Medio</em>: sin cambios esta semana, con la logística portuaria como foco y sin alertas nuevas verificadas en inocuidad</h1>
       <p class="lead">El modelo cruzó tu historial de inspecciones con el monitoreo de fuentes regulatorias, portuarias y de prensa de los últimos 7 días. Esto es lo que encontró para tus proveedores chinos al corte de este informe.</p>
       <div class="meta-row">
-        <div>CORTE DE DATOS <b>26-oct-2026</b></div>
+        <div>CORTE DE DATOS <b>2-nov-2026</b></div>
         <div>PROVEEDORES ANALIZADOS <b>47</b></div>
         <div>INSPECCIONES EN CARTERA <b>413</b></div>
-        <div>DATOS INTERNOS HASTA <b>26-jul-2026 (92 días de antigüedad)</b></div>
-        <div>VARIACIÓN <b>Sin cambio vs. semana 43 (46)</b></div>
+        <div>DATOS INTERNOS HASTA <b>26-jul-2026 (99 días de antigüedad)</b></div>
+        <div>VARIACIÓN <b>Sin cambio vs. semana 44 (46)</b></div>
       </div>
     </div>
 
@@ -311,7 +340,7 @@
               <circle class="pulse" cx="50" cy="30" r="4" fill="none" stroke="#D96B1F" stroke-width="1.6"/>
               <circle cx="50" cy="30" r="4" fill="#D96B1F"/>
               <text x="60" y="26" fill="#DCE6EA" font-family="IBM Plex Mono, monospace" font-size="9">Shanghai</text>
-              <text x="60" y="37" fill="#93A6B4" font-family="IBM Plex Mono, monospace" font-size="8">previsión espera &gt;5 d (Dimerco)</text>
+              <text x="60" y="37" fill="#93A6B4" font-family="IBM Plex Mono, monospace" font-size="8">previsión espera &gt;5 d (Dimerco, oct)</text>
             </g>
             <g>
               <circle class="pulse d2" cx="47" cy="63" r="4" fill="none" stroke="#D96B1F" stroke-width="1.6"/>
@@ -401,7 +430,7 @@
       </div>
       <div class="stat">
         <div class="num">3,6 %</div>
-        <div class="desc">Tasa de rechazo en China (15 de 413 inspecciones) frente a 2,5 % en el resto de la cartera (22 de 893)</div>
+        <div class="desc">Tasa de rechazo en China (15 de 413 inspecciones) frente a 2,5 % en el resto de la cartera (22 de 891)</div>
       </div>
     </div>
 
@@ -431,8 +460,8 @@
         </div>
         <div>
           <div class="headline">Sin tifón con cierre portuario verificado en los últimos 7 días</div>
-          <p>La búsqueda de los últimos 7 días no arrojó cierres de puertos chinos por tifón; la temporada sigue activa y el último cierre verificado fue el del tifón Dolphin en agosto de 2026. Sin novedad verificada esta semana; se mantiene el puntaje de clima.</p>
-          <div class="src">Fuente: Maritime Executive (ago 2026); sin novedad verificada esta semana</div>
+          <p>La búsqueda de los últimos 7 días no arrojó cierres de puertos chinos por tifón; el último cierre verificado en 2026 fue por el tifón de agosto en Zhejiang y Fujian. Sin novedad verificada esta semana; se mantiene el puntaje de clima.</p>
+          <div class="src">Fuente: Business Today (8-ago-2026); sin novedad verificada esta semana</div>
         </div>
       </div>
 
@@ -442,8 +471,8 @@
           <span class="chip alto">Alto</span>
         </div>
         <div>
-          <div class="headline">Shanghai mantiene espera de buques por sobre lo normal</div>
-          <p>Dimerco, en su reporte de octubre de 2026, anticipa que Shanghai seguirá muy congestionado hasta mediados o fines de octubre, con esperas de atraque superiores a 5 días. Es una previsión, no una medición semanal; para Ningbo no hay dato semanal verificado.</p>
+          <div class="headline">Shanghai y Ningbo: sin dato semanal nuevo de espera de buques</div>
+          <p>Dimerco, en su reporte de octubre de 2026, anticipó esperas de atraque superiores a 5 días en Shanghai hasta fines de octubre. Es una previsión, no una medición semanal; no se verificó un dato nuevo de los últimos 7 días ni para Shanghai ni para Ningbo, por lo que se mantiene el puntaje de logística.</p>
           <div class="src">Fuente: Dimerco, reporte de fletes de octubre 2026</div>
         </div>
       </div>
@@ -455,7 +484,7 @@
         </div>
         <div>
           <div class="headline">Tregua EE.UU.–China vigente hasta el 10 de enero de 2027</div>
-          <p>Los negociadores acordaron extender el acuerdo de Kuala Lumpur, que suspende ciertos aranceles y medidas no arancelarias, desde el 10 de noviembre de 2026 hasta el 10 de enero de 2027. Sin cambios adicionales verificados en los últimos 7 días.</p>
+          <p>Los negociadores acordaron extender el acuerdo de Kuala Lumpur desde el 10 de noviembre de 2026 hasta el 10 de enero de 2027. Sin cambios adicionales verificados en los últimos 7 días.</p>
           <div class="src">Fuente: Caixin Global (1-oct-2026); sin cambios verificados en los últimos 7 días</div>
         </div>
       </div>
@@ -479,19 +508,19 @@
 <section class="matrix">
   <div class="wrap">
     <div class="eyebrow dark"><span class="dot"></span> RESULTADO DEL MODELO</div>
-    <h2>Matriz de Riesgo Compuesto — China, 26-oct-2026</h2>
+    <h2>Matriz de Riesgo Compuesto — China, 2-nov-2026</h2>
     <div class="table-scroll">
     <table>
       <thead>
         <tr><th>Dimensión</th><th>Nivel</th><th>Driver principal</th></tr>
       </thead>
       <tbody>
-        <tr><td>Logística / tiempos de embarque</td><td><span class="chip alto">Alto</span></td><td class="driver">Previsión de espera &gt;5 días en Shanghai hasta fines de oct 2026 (Dimerco); sin dato semanal para Ningbo. Puntaje 60.</td></tr>
+        <tr><td>Logística / tiempos de embarque</td><td><span class="chip alto">Alto</span></td><td class="driver">Previsión de espera &gt;5 días en Shanghai hasta fines de oct 2026 (Dimerco); sin dato semanal nuevo para Shanghai ni Ningbo. Puntaje 60.</td></tr>
         <tr><td>Climático / operación portuaria</td><td><span class="chip medio">Medio</span></td><td class="driver">Sin cierre por tifón verificado en 7 días; temporada activa. Puntaje 30.</td></tr>
         <tr><td>Inocuidad alimentaria</td><td><span class="chip medio">Medio</span></td><td class="driver">Sin alerta nueva verificada en 7 días; Import Alert 16-131 vigente. Puntaje 50.</td></tr>
         <tr><td>Regulatorio / arancelario</td><td><span class="chip medio">Medio</span></td><td class="driver">Tregua vigente al 10-ene-2027, sin cambios verificados en 7 días. Puntaje 40.</td></tr>
-        <tr><td>Histórico interno GIS</td><td><span class="chip medio">Medio</span></td><td class="driver">413 casos China (11-ene-2025 a 26-jul-2026): 27,8 % con observaciones y 3,6 % de rechazo. Puntaje 45.</td></tr>
-        <tr><td>Índice compuesto final</td><td><span class="chip medio">Medio</span></td><td class="driver">Ponderación GIS 25 %, logística 20 %, clima 15 %, inocuidad 20 %, regulatorio 20 %: 0,25×45 + 0,20×60 + 0,15×30 + 0,20×50 + 0,20×40 = 45,75 → 46/100 (sin variación vs. 46 de la semana 43).</td></tr>
+        <tr><td>Histórico interno GIS</td><td><span class="chip medio">Medio</span></td><td class="driver">413 casos China (11-ene-2025 a 26-jul-2026): 27,8 % con observaciones (115/413) y 3,6 % de rechazo (15/413). Puntaje 45.</td></tr>
+        <tr><td>Índice compuesto final</td><td><span class="chip medio">Medio</span></td><td class="driver">Ponderación GIS 25 %, logística 20 %, clima 15 %, inocuidad 20 %, regulatorio 20 %: 0,25×45 + 0,20×60 + 0,15×30 + 0,20×50 + 0,20×40 = 45,75 → 46/100 (sin variación vs. 46 de la semana 44).</td></tr>
       </tbody>
     </table>
     </div>
@@ -529,7 +558,7 @@
     <h2>Blinda tu próxima carga antes de que zarpe</h2>
     <p>Conversemos sobre cómo el GIS Risk Forecaster puede orientar la inspección de tus proveedores en China dentro de tu próximo ciclo de embarques.</p>
     <a class="btn" href="https://globalinspectionservice.com/">Hablar con mi Ejecutivo GIS</a>
-    <div class="note">Análisis generado por GIS Risk Forecaster · semana 44 · corte de datos 26 de octubre de 2026</div>
+    <div class="note">Análisis generado por GIS Risk Forecaster · semana 45 · corte de datos 2 de noviembre de 2026</div>
   </div>
 </section>
 
@@ -546,14 +575,14 @@
         <ul>
           <li>Dimerco, Medio — reporte de fletes (oct 2026)</li>
           <li>Caixin Global, Medio — extensión de tregua EE.UU.–China (oct 2026)</li>
-          <li>Maritime Executive, Medio — cierres portuarios por tifón Dolphin (ago 2026, contexto)</li>
+          <li>Business Today, Medio — cierres portuarios por tifón en Zhejiang y Fujian (ago 2026, contexto)</li>
           <li>FDA, Organismo — Import Alert 16-131 camarón de acuicultura desde China (vigente)</li>
           <li>Base interna GIS, Interno — Listado de Inspecciones Total v2 (corte 26-jul-2026)</li>
         </ul>
       </div>
     </div>
     <div class="disclaimer">
-      Este informe cruza datos internos de inspección de GIS con fuentes públicas de prensa y organismos regulatorios. Los niveles de riesgo son referenciales, se recalculan cada semana y este corte corresponde al 26 de octubre de 2026. Documento de uso comercial — Global Inspection Service (GIS).
+      Este informe cruza datos internos de inspección de GIS con fuentes públicas de prensa y organismos regulatorios. Los niveles de riesgo son referenciales, se recalculan cada semana y este corte corresponde al 2 de noviembre de 2026. Documento de uso comercial — Global Inspection Service (GIS).
     </div>
   </div>
 </footer>
